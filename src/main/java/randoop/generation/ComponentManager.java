@@ -1,14 +1,18 @@
 package randoop.generation;
 
-import java.sql.SQLOutput;
-import java.util.*;
-
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import randoop.main.RandoopBug;
 import randoop.operation.TypedClassOperation;
 import randoop.operation.TypedOperation;
 import randoop.reflection.TypeInstantiator;
 import randoop.sequence.ClassLiterals;
+import randoop.sequence.ClassOrPackageInfo;
+import randoop.sequence.ConstantMiningInfo;
 import randoop.sequence.PackageLiterals;
 import randoop.sequence.Sequence;
 import randoop.sequence.SequenceCollection;
@@ -59,11 +63,7 @@ public class ComponentManager {
    */
   private final Collection<Sequence> gralSeeds;
 
-  //TODO: add comment
-  private Map<Sequence, Integer> sequenceFrequencyMap;
 
-  //TODO: add comment
-  private Map<Sequence, Integer> sequenceOccurrenceMap;
 
   /**
    * Components representing literals that should only be used as input to specific classes.
@@ -149,8 +149,16 @@ public class ComponentManager {
   //TODO: add comment
   public void addPackageLevelLiteralInfo(Package pkg, Sequence seq, int frequency, int occurrences) {
     assert packageLiterals != null;
-    packageLiterals.addSequenceFrequency(pkg, seq, frequency);
-    packageLiterals.addSequenceOccurrence(pkg, seq, occurrences);
+    if (constantMiningInfo == null) {
+      constantMiningInfo = new ClassOrPackageInfo<Package>();
+    }
+    constantMiningInfo.addSequenceFrequency(pkg, seq, frequency);
+    constantMiningInfo.addSequenceOccurrence(pkg, seq, occurrences);
+
+    HashMap<String, Integer> map1 = new HashMap<>();
+    map1.put("sss", 1);
+    HashMap<String, ?> map = map1;
+    map.get()
   }
 
   /**
@@ -164,56 +172,52 @@ public class ComponentManager {
 
   // TODO: add comment
   public void addGeneratedSequenceInfo(Sequence sequence, int frequency, int occurrences) {
-    if (sequenceFrequencyMap == null) {
-      sequenceFrequencyMap = new HashMap<>();
+    if (constantMiningInfo == null) {
+        constantMiningInfo = new GeneralInfo<Package>();
     }
-    sequenceFrequencyMap.put(sequence, frequency);
-
-    if (sequenceOccurrenceMap == null) {
-      sequenceOccurrenceMap = new HashMap<>();
-    }
-    sequenceOccurrenceMap.put(sequence, occurrences);
+    constantMiningInfo.addSequenceFrequency(null, sequence, frequency);
+    constantMiningInfo.addSequenceOccurrence(null, sequence, occurrences);
   }
 
-  // TODO: Remove this method
-  public void test() {
-    // ALL
-//    // print global frequencymap and occurrencemap
-//    System.out.println("Global Frequency Map");
-//    for (Map.Entry<Sequence, Integer> entry : sequenceFrequencyMap.entrySet()) {
-//      System.out.println(entry.getKey() + " : " + entry.getValue());
-//    }
-//    System.out.println("Global Occurrence Map");
-//    for (Map.Entry<Sequence, Integer> entry : sequenceOccurrenceMap.entrySet()) {
-//      System.out.println(entry.getKey() + " : " + entry.getValue());
-//    }
-
-    // CLASS
-//    System.out.println("Class Frequency Map");
-//    for (Map.Entry<ClassOrInterfaceType, Map<Sequence, Integer>> entry : classLiterals.getSequenceFrequencyMap().entrySet()) {
+//  // TODO: Remove this method
+//  public void test() {
+//    // ALL
+////    // print global frequencymap and occurrencemap
+////    System.out.println("Global Frequency Map");
+////    for (Map.Entry<Sequence, Integer> entry : sequenceFrequencyMap.entrySet()) {
+////      System.out.println(entry.getKey() + " : " + entry.getValue());
+////    }
+////    System.out.println("Global Occurrence Map");
+////    for (Map.Entry<Sequence, Integer> entry : sequenceOccurrenceMap.entrySet()) {
+////      System.out.println(entry.getKey() + " : " + entry.getValue());
+////    }
+//
+//    // CLASS
+////    System.out.println("Class Frequency Map");
+////    for (Map.Entry<ClassOrInterfaceType, Map<Sequence, Integer>> entry : classLiterals.getSequenceFrequencyMap().entrySet()) {
+////      System.out.println(entry.getKey());
+////      for (Map.Entry<Sequence, Integer> entry2 : entry.getValue().entrySet()) {
+////        System.out.println(entry2.getKey() + " : " + entry2.getValue());
+////      }
+////    }
+//
+//    // PACKAGE
+//    System.out.println("Package Frequency Map");
+//    for (Map.Entry<Package, Map<Sequence, Integer>> entry : packageLiterals.getSequenceFrequencyMap().entrySet()) {
 //      System.out.println(entry.getKey());
 //      for (Map.Entry<Sequence, Integer> entry2 : entry.getValue().entrySet()) {
 //        System.out.println(entry2.getKey() + " : " + entry2.getValue());
 //      }
 //    }
-
-    // PACKAGE
-    System.out.println("Package Frequency Map");
-    for (Map.Entry<Package, Map<Sequence, Integer>> entry : packageLiterals.getSequenceFrequencyMap().entrySet()) {
-      System.out.println(entry.getKey());
-      for (Map.Entry<Sequence, Integer> entry2 : entry.getValue().entrySet()) {
-        System.out.println(entry2.getKey() + " : " + entry2.getValue());
-      }
-    }
-
-    System.out.println("Package Occurrence Map");
-    for (Map.Entry<Package, Map<Sequence, Integer>> entry : packageLiterals.getSequenceOccurrenceMap().entrySet()) {
-      System.out.println(entry.getKey());
-      for (Map.Entry<Sequence, Integer> entry2 : entry.getValue().entrySet()) {
-        System.out.println(entry2.getKey() + " : " + entry2.getValue());
-      }
-    }
-  }
+//
+//    System.out.println("Package Occurrence Map");
+//    for (Map.Entry<Package, Map<Sequence, Integer>> entry : packageLiterals.getSequenceOccurrenceMap().entrySet()) {
+//      System.out.println(entry.getKey());
+//      for (Map.Entry<Sequence, Integer> entry2 : entry.getValue().entrySet()) {
+//        System.out.println(entry2.getKey() + " : " + entry2.getValue());
+//      }
+//    }
+//  }
 
   /**
    * Removes any components sequences added so far, except for seed sequences, which are preserved.

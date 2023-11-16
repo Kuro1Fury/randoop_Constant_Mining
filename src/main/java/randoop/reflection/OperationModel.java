@@ -311,21 +311,21 @@ public class OperationModel {
     }
   }
 
-  // TODO: delete this method
-  public static void main(String[] args) {
-    ComponentManager compMgr = new ComponentManager();
-    OperationModel om = new OperationModel();
-    ClassLiteralExtractor extractor = new ClassLiteralExtractor(om.classLiteralMap, om.sequenceInfoMap);
-    extractor.visitBefore(ClassOne.class);
-//    extractor.visitBefore(ClassTwo.class);
-    extractor.visitBefore(ClassThree.class);
-    extractor.visitBefore(randoop.generation.test2.ClassOne.class);
-//    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.ALL);
-//    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.CLASS);
-
-    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.PACKAGE);
-    compMgr.test();
-  }
+//  // TODO: delete this method
+//  public static void main(String[] args) {
+//    ComponentManager compMgr = new ComponentManager();
+//    OperationModel om = new OperationModel();
+//    ClassLiteralExtractor extractor = new ClassLiteralExtractor(om.classLiteralMap, om.sequenceInfoMap);
+//    extractor.visitBefore(ClassOne.class);
+////    extractor.visitBefore(ClassTwo.class);
+//    extractor.visitBefore(ClassThree.class);
+//    extractor.visitBefore(randoop.generation.test2.ClassOne.class);
+////    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.ALL);
+////    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.CLASS);
+//
+//    om.addClassLiterals(compMgr, Arrays.asList("CLASSES"), ClassLiteralsMode.PACKAGE);
+//    compMgr.test();
+//  }
 
   /**
    * Given a file containing fully-qualified method signatures, returns the operations for them.

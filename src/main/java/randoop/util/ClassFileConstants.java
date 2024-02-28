@@ -577,6 +577,7 @@ public class ClassFileConstants {
               break;
             case Const.ICONST_0:
               integerConstant(Integer.valueOf(0), result);
+              System.out.println("zero is discovered");
               break;
             case Const.ICONST_1:
               integerConstant(Integer.valueOf(1), result);

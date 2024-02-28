@@ -1,0 +1,6 @@
+talk.hospital.AgeConstants
+talk.hospital.Doctor
+talk.hospital.Patient
+talk.pharmacy.MedicationConstants
+talk.pharmacy.Pharmacist
+talk.pharmacy.Prescription

@@ -627,7 +627,7 @@ public abstract class GenInputsAbstract extends CommandHandler {
    * @see ClassLiteralsMode
    */
   @Option("How to use literal values specified via --literals-file: ALL, PACKAGE, CLASS, or NONE")
-  public static ClassLiteralsMode literals_level = ClassLiteralsMode.CLASS;
+  public static ClassLiteralsMode literals_level = ClassLiteralsMode.ALL;
 
   /**
    * The possible values of the literals_level command-line argument.
@@ -646,7 +646,7 @@ public abstract class GenInputsAbstract extends CommandHandler {
   }
 
   /** Whether to use literals from all classes under test to generate tests. */
-  @Option("Whether to enable Constant Mining to extract constants from CUT")
+  @Option("Whether to enable Constant Mining to extract constants from SUT")
   public static boolean constant_mining = false;
 
   /**

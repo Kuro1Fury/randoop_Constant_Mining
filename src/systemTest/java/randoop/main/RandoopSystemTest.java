@@ -746,6 +746,42 @@ public class RandoopSystemTest {
     generateAndTest(testEnvironment, options, expectedRegressionTests, expectedErrorTests);
   }
 
+  @Test
+  public void runTempTest() {
+    SystemTestEnvironment testEnvironment =
+            systemTestEnvironmentManager.createTestEnvironment(
+                    "temp-test"); // temp directory
+    RandoopOptions options = createRandoopOptions(testEnvironment);
+    options.setPackageName(null);
+    options.setRegressionBasename("TempTest");
+//    options.setErrorBasename("TempErr");
+
+    options.setOption("attempted_limit", "1000");
+    options.setOption("generated_limit", "400");
+//    options.addTestClass("temp.UniversityGradingSystem");
+    options.addClassList("resources/systemTest/talkclasses.txt");
+    options.setOption("literals-file", "CLASSES");
+    options.setOption("literals-level", "PACKAGE");
+    options.setOption("constant-mining", "true");
+    options.setOption("constant_mining_probability", "1");
+
+    ExpectedTests expectedRegressionTests = ExpectedTests.SOME;
+    ExpectedTests expectedErrorTests = ExpectedTests.NONE;
+
+    CoverageChecker coverageChecker =
+            new CoverageChecker(
+                    options,
+                    // XXX after adding compile check this method did not appear in JDK7 runs
+                    "randoop.test.LongString.tooLongString() ignore");
+    generateAndTest(
+            testEnvironment, options, expectedRegressionTests, expectedErrorTests, coverageChecker);
+
+
+//    ExpectedTests expectedRegressionTests = ExpectedTests.SOME;
+//    ExpectedTests expectedErrorTests = ExpectedTests.NONE;
+//    generateAndTest(testEnvironment, options, expectedRegressionTests, expectedErrorTests);
+  }
+
   /**
    * Test formerly known as randoop-long-string. Previously performed a diff on generated test and
    * goal file.

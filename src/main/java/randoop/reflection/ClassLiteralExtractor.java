@@ -93,6 +93,7 @@ class ClassLiteralExtractor extends DefaultClassVisitor {
             occurredSequences.contains(seq),
             constantSet.getConstantFrequency(term.getValue()));
         occurredSequences.add(seq);
+        System.out.println("Current sequence: " + seq + " class: " + c.getName() + " constantType: " + constantType);
       }
     }
     if (GenInputsAbstract.constant_mining) {

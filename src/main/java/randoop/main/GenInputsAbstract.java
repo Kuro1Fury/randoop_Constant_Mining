@@ -480,7 +480,7 @@ public abstract class GenInputsAbstract extends CommandHandler {
 
   ///////////////////////////////////////////////////////////////////
   /**
-   * File containing side-effect-free methods, each given as a <a
+   * File containing side-effect-free methods (also known as "pure methods"), each given as a <a
    * href="https://randoop.github.io/randoop/manual/#fully-qualified-signature">fully-qualified
    * signature</a> on a separate line. Specifying side-effect-free methods has two benefits: it
    * makes regression tests stronger, and it helps Randoop create smaller tests.
@@ -584,6 +584,12 @@ public abstract class GenInputsAbstract extends CommandHandler {
   public static boolean stop_on_error_test = false;
 
   /**
+   * The default value for the {@code --null-ratio} command-line argument. Used to test whether the
+   * command-line argument was present.
+   */
+  private static double null_ratio_default = 0.05;
+
+  /**
    * Use null with the given frequency as an argument to method calls.
    *
    * <p>For example, a null ratio of 0.05 directs Randoop to use {@code null} as an input 5 percent
@@ -645,6 +651,17 @@ public abstract class GenInputsAbstract extends CommandHandler {
     ALL
   }
 
+  /** Whether to use literals from all classes under test to generate tests. */
+  @Option("Whether to enable Constant Mining to extract constants from SUT")
+  public static boolean constant_mining = false;
+
+  /**
+   * The probability of using a constant value as an input to a method under test. This option is
+   * only used when {@code --constant-mining} is set to true.
+   */
+  @Option("The probability to use Constant Mining")
+  public static double constant_mining_probability = 0.1;
+
   /**
    * Randoop generates new tests by choosing from a set of methods under test. This controls how the
    * next method is chosen, from among all methods under test.
@@ -661,7 +678,9 @@ public abstract class GenInputsAbstract extends CommandHandler {
      * It weights each method under test based on the method's branch coverage and the number of
      * times the method is chosen for a new sequence. It requires the Jacoco code coverage tool; run
      * Randoop with {@code -Xbootclasspath/a:/path/to/jacocoagent.jar
-     * -javaagent:/path/to/jacocoagent.jar} .
+     * -javaagent:/path/to/jacocoagent.jar}. Note that the Jacoco coverage tool cannot collect any
+     * data from the Java runtime libraries, e.g., {@code java.lang}; thus they are not useful
+     * candidates for the Bloodhound technique.
      */
     BLOODHOUND
   }
@@ -877,10 +896,14 @@ public abstract class GenInputsAbstract extends CommandHandler {
   // argument is to forbid certain other command-line arguments that would themselves introduce
   // nondeterminism.
   /**
-   * If true, Randoop is deterministic: running Randoop twice with the same arguments (including
-   * {@code --randomseed}) will produce the same test suite, so long as the program under test is
-   * deterministic. If false, Randoop may or may not produce the same test suite. To produce
-   * multiple different test suites, use the {@code --randomseed} command-line option.
+   * By default, Randoop is deterministic: running Randoop twice with the same arguments will
+   * produce the same test suite, so long as the program under test is deterministic. (To produce
+   * multiple different test suites, use the {@code --randomseed} command-line option.) However,
+   * there are command-line arguments that make Randoop non-deterministic. Passing {@code
+   * --deterministic} makes Randoop fail if one of the non-deterministic command-line arguments is
+   * also passed; that is, passing {@code --deterministic} is a way to ensure you are not invoking
+   * Randoop in a way that may lead to non-deterministic output. The {@code --deterministic} command
+   * line argument doesn't itself do anything except check other command-line arguments.
    */
   @Option("If true, Randoop is deterministic")
   public static boolean deterministic = false;
@@ -910,8 +933,8 @@ public abstract class GenInputsAbstract extends CommandHandler {
   public static @Owning FileWriterWithName log = null;
 
   /**
-   * A file to which to log selections; helps find sources of non-determinism. If not specified, no
-   * logging is done.
+   * A file to which to log selections; helps find sources of non-determinism (randomness). If not
+   * specified, no logging is done.
    */
   @Option("<filename> Log each random selection to this file")
   public static FileWriterWithName selection_log = null;
@@ -959,6 +982,13 @@ public abstract class GenInputsAbstract extends CommandHandler {
     if (null_ratio < 0 || null_ratio > 1) {
       throw new RandoopUsageError("--null-ratio must be between 0 and 1, inclusive.");
     }
+    if (forbid_null) {
+      if (null_ratio != 0 && null_ratio != null_ratio_default) {
+        throw new RandoopUsageError("Both --forbid_null and --null-ratio were provided");
+      } else {
+        null_ratio = 0;
+      }
+    }
 
     if (maxsize <= 0) {
       throw new RandoopUsageError(
@@ -969,6 +999,18 @@ public abstract class GenInputsAbstract extends CommandHandler {
       throw new RandoopUsageError(
           "Invalid parameter combination:"
               + " specified a class literal file and --use-class-literals=NONE");
+    }
+
+    if (constant_mining && literals_level == ClassLiteralsMode.NONE) {
+      throw new RandoopUsageError(
+          "Invalid parameter combination:"
+              + " specified --constant-mining and --use-class-literals=NONE");
+    }
+
+    if (constant_mining && (constant_mining_probability < 0 || constant_mining_probability > 1)) {
+      throw new RandoopUsageError(
+          "Invalid parameter combination:"
+              + " specified --constant-mining and --constant-mining-probability is not in [0, 1]");
     }
 
     if (deterministic && ReflectionExecutor.usethreads) {

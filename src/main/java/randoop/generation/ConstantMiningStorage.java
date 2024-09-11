@@ -1,6 +1,7 @@
 package randoop.generation;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import randoop.main.GenInputsAbstract;
@@ -145,7 +146,9 @@ public class ConstantMiningStorage<T> {
    * @return the set of sequences that recorded under the specific scope
    */
   public Set<Sequence> getSequencesForScope(T t) {
-    return frequencyInfo.get(t).keySet();
+    Map<Sequence, Integer> map = frequencyInfo.get(t);
+    if(map != null) return frequencyInfo.get(t).keySet();
+    else return new HashSet<>();
   }
 
   /**
